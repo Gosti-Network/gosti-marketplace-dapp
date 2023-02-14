@@ -5,11 +5,11 @@ import {
 } from '@mui/material';
 import { Dispatch, SetStateAction } from 'react';
 
-import type Game from '../spriggan-shared/types/Game';
+import type Media from '../spriggan-shared/types/Media';
 import StorePage, { StorePageProps } from './StorePage';
 
 export type GameCardProps = {
-	game: Game;
+	game: Media;
 	setActiveOffer: Dispatch<SetStateAction<string>>;
 	onBuy: () => void;
 };

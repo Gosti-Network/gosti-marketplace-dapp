@@ -3,9 +3,9 @@ import './App.css';
 
 import axios from 'axios';
 
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import MainTopBar from "./components/MainTopBar";
-import Game from "./spriggan-shared/types/Game";
+import Media from "./spriggan-shared/types/Media";
 
 import { useWalletConnectClient } from "./contexts/ClientContext";
 import { useJsonRpc } from "./contexts/JsonRpcContext";
@@ -20,7 +20,7 @@ function App() {
 
 	const { search, mostRecent } = useSearch()
 	
-	const [searchResults, setSearchResults] = useState<Game[]>([]);
+	const [searchResults, setSearchResults] = useState<Media[]>([]);
 	useEffect(() => {
 		if (searchTerm !== "") {
 			clearTimeout(searchDebounce)
@@ -30,7 +30,7 @@ function App() {
 		}
 	}, [searchTerm]);
 
-	const [mostRecentResults, setMostRecentResults] = useState<Game[]>([]);
+	const [mostRecentResults, setMostRecentResults] = useState<Media[]>([]);
 	useEffect(() => {
 		async function fetchData() {
 			setMostRecentResults(await mostRecent({} as SearchParams));
@@ -109,6 +109,20 @@ function App() {
 	
 	return (
 			<Box>
+				<Button onClick={async () => {
+					const body = {
+						jsonrpc: "2.0",
+						method: "download",
+						id: "download from Spriggan",
+						params: {product: {mediaType: "game", title: "cool game"}},
+					};
+					try {
+						const response = await axios.post(`http://127.0.0.1:5235/`, body);
+						console.log('bitch', response.data);
+					} catch (error: any) {
+						console.log('hoe', error.response.data);
+					}
+				}}>Execute test</Button>
 				{MainTopBar(session, onConnect, onPing, disconnect, (event) => {setSearchTerm(event.target.value)})}
 				{GameGrid("Search Results", searchResults, executeOffer, setActiveOffer)}
 				{GameGrid("Recently Updated", mostRecentResults, executeOffer, setActiveOffer)}

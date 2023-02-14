@@ -12,7 +12,7 @@ import { sha256 } from 'js-sha256';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { Buffer } from 'buffer';
 
-import type Game from '../spriggan-shared/types/Game';
+import type Media from '../spriggan-shared/types/Media';
 
 const Transition = React.forwardRef((props: SlideProps, ref) => {
 	return <Slide direction="up" ref={ref} {...props} />;
@@ -52,7 +52,7 @@ function TabProps(index: number) {
 }
 
 export type StorePageProps = {
-	game: Game;
+	game: Media;
 	setActiveOffer: Dispatch<SetStateAction<string>>;
 	onBuy: () => void;
 	open: boolean,

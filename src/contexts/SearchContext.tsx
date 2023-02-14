@@ -6,7 +6,7 @@ import {
 	useContext,
 	useState,
 } from "react";
-import Game from "../spriggan-shared/types/Game";
+import Media from "../spriggan-shared/types/Media";
 import { SearchParams } from "../spriggan-shared/types/SearchTypes";
 
 /**
@@ -19,7 +19,7 @@ interface IContext {
 	mostRecent: SearchCallback,
 }
 
-type SearchCallback = (params: SearchParams) => Promise<Game[]>;
+type SearchCallback = (params: SearchParams) => Promise<Media[]>;
 
 /**
  * Context
@@ -35,10 +35,10 @@ export function SearchContextProvider({children}: {
 	const [apiUrl, setApiUrl] = useState('http://localhost:5233')
 
 	const hitsToGameList = (hits: any) => {
-		const games = new Array<Game>()
+		const games = new Array<Media>()
 		if (hits) {
 			hits.forEach((hit: any) => {
-				games.push(hit._source as Game)
+				games.push(hit._source as Media)
 			});
 		}
 		return games
