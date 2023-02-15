@@ -7,8 +7,8 @@ import { Box, Button } from "@mui/material";
 import MainTopBar from "./components/MainTopBar";
 import Media from "./spriggan-shared/types/Media";
 
-import { useWalletConnectClient } from "./contexts/ClientContext";
-import { useJsonRpc } from "./contexts/JsonRpcContext";
+import { useWalletConnectClient } from "./chia-walletconnect/WalletConnectClientContext";
+import { useWalletConnectRpc, WalletConnectParams } from "./chia-walletconnect/WalletConnectRpcContext";
 import GameGrid from "./components/GameGrid";
 import { useSearch } from "./contexts/SearchContext";
 import { SearchParams } from "./spriggan-shared/types/SearchTypes";
@@ -54,15 +54,13 @@ function App() {
 		session,
 		connect,
 		disconnect,
-		chains,
-		setChains,
 	} = useWalletConnectClient();
 
 	// Use `JsonRpcContext` to provide us with relevant RPC methods and states.
 	const {
 		ping,
-		chiaRpc,
-	} = useJsonRpc();
+		walletconnectRpc,
+	} = useWalletConnectRpc();
 
 	// Close the pairing modal after a session is established.
 	useEffect(() => {
@@ -79,7 +77,7 @@ function App() {
 		if (pairings.length) {
 			connect(pairings[0]);
 		} else {
-			handleChainSelectionClick("chia:mainnet");
+			// handleChainSelectionClick("chia:mainnet");
 			// If no existing pairings are available, trigger `WalletConnectClient.connect`.
 			connect();
 		}
@@ -94,17 +92,17 @@ function App() {
 		if (session && activeOffer) {
 			var x = session.namespaces.chia.accounts[0].split(":");
 			console.log(x[0] + ':' + x[1], x[2]);
-			await chiaRpc.acceptOffer(x[0] + ':' + x[1], x[2], activeOffer);
+			await walletconnectRpc.acceptOffer({ offer: activeOffer } as WalletConnectParams);
 		}
 	};
 
-	const handleChainSelectionClick = (chainId: string) => {
-		if (chains.includes(chainId)) {
-			// setChains(chains.filter((chain) => chain !== chainId));
-		} else {
-			setChains([...chains, chainId]);
-		}
-	};
+	// const handleChainSelectionClick = (chainId: string) => {
+	// 	if (chains.includes(chainId)) {
+	// 		// setChains(chains.filter((chain) => chain !== chainId));
+	// 	} else {
+	// 		setChains([...chains, chainId]);
+	// 	}
+	// };
 
 	
 	return (
