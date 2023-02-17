@@ -61,7 +61,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function PrimarySearchAppBar(
 			session: SessionTypes.Struct | undefined,
 			connectToWallet: () => void,
-			sendDonation: () => void,
 			disconnectFromWallet: () => void,
 			setSearchTerm: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void,
 		) {

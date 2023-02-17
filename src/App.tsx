@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import './App.css';
 
-import axios from 'axios';
-
 import { Box, Button } from "@mui/material";
 import MainTopBar from "./components/MainTopBar";
 import Media from "./spriggan-shared/types/Media";
 
 import { useWalletConnectClient } from "./chia-walletconnect/WalletConnectClientContext";
-import { useWalletConnectRpc, WalletConnectParams } from "./chia-walletconnect/WalletConnectRpcContext";
+import { useWalletConnectRpc, WalletConnectRpcParams } from "./chia-walletconnect/WalletConnectRpcContext";
 import GameGrid from "./components/GameGrid";
 import { useSearch } from "./contexts/SearchContext";
 import { SearchParams } from "./spriggan-shared/types/SearchTypes";
+import { connected } from "process";
 
 function App() {
 	const [searchTerm, setSearchTerm] = useState<string>("");
@@ -38,14 +37,11 @@ function App() {
 		  fetchData();
 	}, [mostRecent]);
 
+
 	useEffect(() => {
 		document.title = `Spriggan Marketplace`;
 	}, [searchResults]);
 
-	const [modal, setModal] = useState("");
-
-	const closeModal = () => setModal("");
-	const openPingModal = () => setModal("ping");
 
 	// Initialize the WalletConnect client.
 	const {
@@ -54,6 +50,7 @@ function App() {
 		session,
 		connect,
 		disconnect,
+		isInitializing,
 	} = useWalletConnectClient();
 
 	// Use `JsonRpcContext` to provide us with relevant RPC methods and states.
@@ -62,12 +59,33 @@ function App() {
 		walletconnectRpc,
 	} = useWalletConnectRpc();
 
-	// Close the pairing modal after a session is established.
+
 	useEffect(() => {
-		if (session && modal === "pairing") {
-		closeModal();
+		async function testConnection() {
+			try {
+				const connected = await ping();
+				if (!connected) {
+					disconnect()
+				}
+				return connected
+			} catch (e) {
+				console.log("ping fail", e)
+				disconnect();
+			}
 		}
-	}, [session, modal]);
+
+		if (!isInitializing) {
+			testConnection()
+		}
+
+		const interval = setInterval(() => {
+			// This will run every 10 mins
+			console.log("Ping: ", testConnection());
+		}, 1000 * 60 * 1);
+
+		return () => clearInterval(interval)
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [session]);
 
 	const onConnect = () => {
 		if (typeof client === "undefined") {
@@ -77,51 +95,30 @@ function App() {
 		if (pairings.length) {
 			connect(pairings[0]);
 		} else {
-			// handleChainSelectionClick("chia:mainnet");
 			// If no existing pairings are available, trigger `WalletConnectClient.connect`.
 			connect();
 		}
 	};
 
-	const onPing = async () => {
-		openPingModal();
-		await ping();
-	};
 
 	const executeOffer = async () => {
 		if (session && activeOffer) {
 			var x = session.namespaces.chia.accounts[0].split(":");
 			console.log(x[0] + ':' + x[1], x[2]);
-			await walletconnectRpc.acceptOffer({ offer: activeOffer } as WalletConnectParams);
+			await walletconnectRpc.takeOffer({ fingerprint: x[2], offer: activeOffer, fee: 1 } as WalletConnectRpcParams);
 		}
 	};
-
-	// const handleChainSelectionClick = (chainId: string) => {
-	// 	if (chains.includes(chainId)) {
-	// 		// setChains(chains.filter((chain) => chain !== chainId));
-	// 	} else {
-	// 		setChains([...chains, chainId]);
-	// 	}
-	// };
 
 	
 	return (
 			<Box>
 				<Button onClick={async () => {
-					const body = {
-						jsonrpc: "2.0",
-						method: "download",
-						id: "download from Spriggan",
-						params: {product: {mediaType: "game", title: "cool game"}},
-					};
-					try {
-						const response = await axios.post(`http://127.0.0.1:5235/`, body);
-						console.log('bitch', response.data);
-					} catch (error: any) {
-						console.log('hoe', error.response.data);
+					if (session) {
+						var x = session.namespaces.chia.accounts[0].split(":");
+						await walletconnectRpc.getNFTs({ fingerprint: x[2] } as WalletConnectRpcParams);
 					}
 				}}>Execute test</Button>
-				{MainTopBar(session, onConnect, onPing, disconnect, (event) => {setSearchTerm(event.target.value)})}
+				{MainTopBar(session, onConnect, disconnect, (event) => {setSearchTerm(event.target.value)})}
 				{GameGrid("Search Results", searchResults, executeOffer, setActiveOffer)}
 				{GameGrid("Recently Updated", mostRecentResults, executeOffer, setActiveOffer)}
 			</Box>
