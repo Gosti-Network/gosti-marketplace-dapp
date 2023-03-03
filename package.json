@@ -5,6 +5,7 @@
   "license": "Apache-2.0",
   "description": "Spriggan Client",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
