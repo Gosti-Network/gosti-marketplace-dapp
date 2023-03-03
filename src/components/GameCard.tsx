@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import { Dispatch, SetStateAction } from 'react';
 
-import type Media from '../spriggan-shared/types/Media';
+import { Media } from '../spriggan-shared/types/Media';
 import StorePage, { StorePageProps } from './StorePage';
 
 export type GameCardProps = {
@@ -28,7 +28,7 @@ export default function GameCard( props: GameCardProps ) {
 				<CardMedia
 					component="img"
 					height="140"
-					image={props.game.capsuleimage}
+					image={props.game.capsuleImage}
 					alt={props.game.title}
 				/>
 				<CardContent>
@@ -36,7 +36,7 @@ export default function GameCard( props: GameCardProps ) {
 					{props.game.title}
 				</Typography>
 				<Typography variant="body2" color="text.secondary">
-					{props.game.shortdescription}
+					{props.game.shortDescription}
 				</Typography>
 				</CardContent>
 			</CardActionArea>

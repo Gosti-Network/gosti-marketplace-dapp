@@ -1,6 +1,6 @@
 import { Grid, Typography } from "@mui/material";
 import Paper from "@mui/material/Paper";
-import Media from "../spriggan-shared/types/Media";
+import { Media } from "../spriggan-shared/types/Media";
 import GameCard from "./GameCard";
 
 const GameGrid = (
@@ -18,7 +18,7 @@ const GameGrid = (
 				<Typography sx={{ p:2 }} variant="h4">{title}</Typography>
 				<Grid container p={4} spacing={4} id="gameslist">
 						{searchResults && searchResults.map((result: Media) => (
-							<Grid key={result.productid} item xs={6} sm={4} md={3} lg={2}>
+							<Grid key={result.productId} item xs={6} sm={4} md={3} lg={2}>
 							<GameCard
 								game={result}
 								onBuy={onBuy}

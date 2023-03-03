@@ -12,7 +12,7 @@ import { sha256 } from 'js-sha256';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { Buffer } from 'buffer';
 
-import type Media from '../spriggan-shared/types/Media';
+import { Media } from '../spriggan-shared/types/Media';
 
 const Transition = React.forwardRef((props: SlideProps, ref) => {
 	return <Slide direction="up" ref={ref} {...props} />;
@@ -66,8 +66,8 @@ export default function StorePage( props: StorePageProps ) {
 	const [tab, setTab] = React.useState(0);
 
 	useEffect(() => {
-		var pubdid = props.game.publisherdid;
-		var id = props.game.productid;
+		var pubdid = props.game.publisherDid;
+		var id = props.game.productId;
 
 		var decoded = Buffer.from(bech32m.fromWords(bech32m.decode(pubdid).words)).toString("hex")
 		
@@ -140,7 +140,7 @@ export default function StorePage( props: StorePageProps ) {
 							<Card sx={{ m: 0, p: 2, height: '100%' }} >
 								<CardMedia
 									component="iframe"
-									src={(props.game.trailersource === 'youtube') ?"https://www.youtube.com/embed/" + props.game.trailer + "?autoplay=1&origin=http://.com": ""}
+									src={(props.game.trailerSource === 'youtube') ?"https://www.youtube.com/embed/" + props.game.trailer + "?autoplay=1&origin=http://.com": ""}
 									height={'360'}
 								/>
 							</Card>
@@ -186,7 +186,7 @@ export default function StorePage( props: StorePageProps ) {
 						</Stack>
 					</Grid>
 					<Card sx={{ m: 1, p: 4, width: '100%' }}>
-						<ReactMarkdown children={props.game.longdescription}/>
+						<ReactMarkdown children={props.game.longDescription}/>
 					</Card>
 				</Grid>
 			</Container>

@@ -3,28 +3,27 @@ import './App.css';
 
 import { Box, Button } from "@mui/material";
 import MainTopBar from "./components/MainTopBar";
-import Media from "./spriggan-shared/types/Media";
+import { Media } from "./spriggan-shared/types/Media";
 
 import { useWalletConnectClient } from "./chia-walletconnect/WalletConnectClientContext";
 import { useWalletConnectRpc, WalletConnectRpcParams } from "./chia-walletconnect/WalletConnectRpcContext";
 import GameGrid from "./components/GameGrid";
-import { useSearch } from "./contexts/SearchContext";
+import { useSearch } from "./spriggan-shared/contexts/SearchContext";
 import { SearchParams } from "./spriggan-shared/types/SearchTypes";
-import { connected } from "process";
 
 function App() {
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [searchDebounce, setSearchDebounce] = useState<NodeJS.Timeout>(setTimeout(async () => {}, 100));
 	const [activeOffer, setActiveOffer] = useState<string>("");
 
-	const { search, mostRecent } = useSearch()
+	const { search } = useSearch()
 	
 	const [searchResults, setSearchResults] = useState<Media[]>([]);
 	useEffect(() => {
 		if (searchTerm !== "") {
 			clearTimeout(searchDebounce)
 			setSearchDebounce(setTimeout(async () => {
-				setSearchResults(await search({titleTerm: searchTerm} as SearchParams))
+				setSearchResults(await search.search({titleTerm: searchTerm} as SearchParams))
 			}, 300));
 		}
 	}, [searchTerm]);
@@ -32,10 +31,10 @@ function App() {
 	const [mostRecentResults, setMostRecentResults] = useState<Media[]>([]);
 	useEffect(() => {
 		async function fetchData() {
-			setMostRecentResults(await mostRecent({} as SearchParams));
-		  }
-		  fetchData();
-	}, [mostRecent]);
+			setMostRecentResults(await search.mostRecent({} as SearchParams));
+		}
+		fetchData();
+	}, [search]);
 
 
 	useEffect(() => {
@@ -93,7 +92,7 @@ function App() {
 		}
 		// Suggest existing pairings (if any).
 		if (pairings.length) {
-			connect(pairings[0]);
+			connect(pairings[pairings.length-1]);
 		} else {
 			// If no existing pairings are available, trigger `WalletConnectClient.connect`.
 			connect();
