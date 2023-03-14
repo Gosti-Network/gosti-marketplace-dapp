@@ -59,11 +59,11 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function PrimarySearchAppBar(
-			session: SessionTypes.Struct | undefined,
-			connectToWallet: () => void,
-			disconnectFromWallet: () => void,
-			setSearchTerm: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void,
-		) {
+	session: SessionTypes.Struct | undefined,
+	connectToWallet: () => void,
+	disconnectFromWallet: () => void,
+	setSearchTerm: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void,
+) {
 
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const [anchor2El, setAnchor2El] = useState<null | HTMLElement>(null);
@@ -110,9 +110,9 @@ export default function PrimarySearchAppBar(
 			}}
 			open={isWalletMenuOpen}
 			onClose={handleClose}
-			>
+		>
 			<MenuItem disabled={true}>Wallet</MenuItem>
-			<Divider/>
+			<Divider />
 			{session
 				? <div>
 					<MenuItem
@@ -134,7 +134,7 @@ export default function PrimarySearchAppBar(
 						Connect to Chia Wallet
 					</MenuItem>
 				</div>
-			
+
 			}
 		</Menu>
 	);
@@ -156,8 +156,8 @@ export default function PrimarySearchAppBar(
 			}}
 			open={isMainMenuOpen}
 			onClose={handleClose2}
-			>
-			<ThemeSwitcher/>
+		>
+			<ThemeSwitcher />
 		</Menu>
 	);
 
@@ -182,7 +182,7 @@ export default function PrimarySearchAppBar(
 						component="div"
 						sx={{ display: { xs: 'none', sm: 'block' } }}
 					>
-						Spriggan Marketplace 
+						Spriggan Marketplace
 					</Typography>
 					<Search>
 						<SearchIconWrapper>
@@ -205,13 +205,13 @@ export default function PrimarySearchAppBar(
 							onClick={handleClick}
 						>
 							{session
-								?<Badge variant="dot" overlap="circular" color="success" anchorOrigin={{
+								? <Badge variant="dot" overlap="circular" color="success" anchorOrigin={{
 									vertical: 'bottom',
 									horizontal: 'left',
 								}}>
 									<AccountBalanceWalletIcon />
 								</Badge>
-								:<Badge variant="dot" overlap="circular" color="warning" anchorOrigin={{
+								: <Badge variant="dot" overlap="circular" color="warning" anchorOrigin={{
 									vertical: 'bottom',
 									horizontal: 'left',
 								}}>

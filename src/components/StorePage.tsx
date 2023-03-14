@@ -59,7 +59,7 @@ export type StorePageProps = {
 	setOpen: Dispatch<SetStateAction<boolean>>
 };
 
-export default function StorePage( props: StorePageProps ) {
+export default function StorePage(props: StorePageProps) {
 
 	const [price, setPrice] = React.useState("");
 	const [asset, setAsset] = React.useState('XCH');
@@ -70,7 +70,7 @@ export default function StorePage( props: StorePageProps ) {
 		var id = props.game.productId;
 
 		var decoded = Buffer.from(bech32m.fromWords(bech32m.decode(pubdid).words)).toString("hex")
-		
+
 		var col = sha256.create().update(decoded + id).hex()
 		var collectionID = bech32m.encode("col", bech32m.toWords(Buffer.from(col, "hex")))
 
@@ -84,7 +84,7 @@ export default function StorePage( props: StorePageProps ) {
 					setPrice("Not Found");
 				}
 			}
-		)
+			)
 	}, [asset]);
 
 	const assets = [
@@ -98,7 +98,7 @@ export default function StorePage( props: StorePageProps ) {
 	const handleTabChange = (event: React.SyntheticEvent<Element, Event>, newValue: number) => {
 		setTab(newValue);
 	};
-	
+
 	return (
 		<Dialog
 			fullScreen
@@ -107,19 +107,19 @@ export default function StorePage( props: StorePageProps ) {
 			TransitionComponent={Transition}
 		>
 			<AppBar sx={{ position: 'relative' }}>
-			<Toolbar>
-				<IconButton
-					edge="start"
-					color="inherit"
-					onClick={handleClose}
-					aria-label="close"
-				>
-				<CloseIcon />
-				</IconButton>
-				<Typography sx={{ ml: 2, flex: 1 }} variant="h6">
-					{props.game.title}
-				</Typography>
-			</Toolbar>
+				<Toolbar>
+					<IconButton
+						edge="start"
+						color="inherit"
+						onClick={handleClose}
+						aria-label="close"
+					>
+						<CloseIcon />
+					</IconButton>
+					<Typography sx={{ ml: 2, flex: 1 }} variant="h6">
+						{props.game.title}
+					</Typography>
+				</Toolbar>
 			</AppBar>
 			<Container fixed>
 				<AppBar position="static">
@@ -135,12 +135,12 @@ export default function StorePage( props: StorePageProps ) {
 					</Tabs>
 				</AppBar>
 				<Grid container height={420} sx={{ width: '100%', m: 0 }}>
-					<Grid id="mediaSection" item xs={12} md={8} sx={{ m:0, p: 0, height: '100%' }}>
+					<Grid id="mediaSection" item xs={12} md={8} sx={{ m: 0, p: 0, height: '100%' }}>
 						<TabPanel value={tab} index={0}>
 							<Card sx={{ m: 0, p: 2, height: '100%' }} >
 								<CardMedia
 									component="iframe"
-									src={(props.game.trailerSource === 'youtube') ?"https://www.youtube.com/embed/" + props.game.trailer + "?autoplay=1&origin=http://.com": ""}
+									src={(props.game.trailerSource === 'youtube') ? "https://www.youtube.com/embed/" + props.game.trailer + "?autoplay=1&origin=http://.com" : ""}
 									height={'360'}
 								/>
 							</Card>
@@ -149,20 +149,20 @@ export default function StorePage( props: StorePageProps ) {
 							{price}
 						</TabPanel>
 					</Grid>
-					<Grid id="infoSection" item xs={12} md={4}  sx={{ height: '100%'}}>
-						<Stack sx={{ height: '100%'}}>
+					<Grid id="infoSection" item xs={12} md={4} sx={{ height: '100%' }}>
+						<Stack sx={{ height: '100%' }}>
 							<Card sx={{ p: 1, m: 1, height: '60%' }}>
 								<Typography p={1} variant="h5">{props.game.title}</Typography>
-								<Divider/>
+								<Divider />
 								<Typography p={2}>{props.game.description}</Typography>
-								<Divider/>
+								<Divider />
 								<Typography p={2}>{props.game.tags}</Typography>
 							</Card>
 							<Card sx={{ m: 1, height: '40%' }}>
 								<Grid container>
-									<Grid  p={2} item sx={{ width: .5 }}>
+									<Grid p={2} item sx={{ width: .5 }}>
 										<Typography p={2}>{price} {asset}</Typography>
-										<Button fullWidth={true} variant="contained"  onClick={props.onBuy}>Buy</Button>
+										<Button fullWidth={true} variant="contained" onClick={props.onBuy}>Buy</Button>
 									</Grid>
 									<Grid p={4} item sx={{ width: .5 }}>
 										<Autocomplete
@@ -186,7 +186,7 @@ export default function StorePage( props: StorePageProps ) {
 						</Stack>
 					</Grid>
 					<Card sx={{ m: 1, p: 4, width: '100%' }}>
-						<ReactMarkdown children={props.game.longDescription}/>
+						<ReactMarkdown children={props.game.longDescription} />
 					</Card>
 				</Grid>
 			</Container>

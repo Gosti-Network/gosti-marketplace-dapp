@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
 import App from './App';
 
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
@@ -8,10 +7,9 @@ import { experimental_extendTheme as extendTheme } from '@mui/material/styles';
 import { CssBaseline } from "@mui/material";
 import { green } from '@mui/material/colors';
 
-import { WalletConnectClientContextProvider } from "./chia-walletconnect/WalletConnectClientContext";
-import { WalletConnectRpcContextProvider } from "./chia-walletconnect/WalletConnectRpcContext";
-import { SearchContextProvider } from "./contexts/SearchContext";
-import { SprigganRpcContext } from './spriggan-shared/rpc/SprigganRpcContext';
+import { WalletConnectClientContextProvider } from "./chia-walletconnect/contexts/WalletConnectClientContext";
+import { WalletConnectRpcContextProvider } from "./chia-walletconnect/contexts/WalletConnectRpcContext";
+import { SearchContextProvider } from "./spriggan-shared/contexts/SearchContext";
 
 const theme = extendTheme({
 	colorSchemes: {
@@ -35,10 +33,10 @@ root.render(
 			<WalletConnectClientContextProvider>
 				<WalletConnectRpcContextProvider>
 					{/* <SprigganRpcContext> */}
-						<SearchContextProvider>
-							<CssBaseline />
-							<App />
-						</SearchContextProvider>
+					<SearchContextProvider>
+						<CssBaseline />
+						<App />
+					</SearchContextProvider>
 					{/* </SprigganRpcContext> */}
 				</WalletConnectRpcContextProvider>
 			</WalletConnectClientContextProvider>

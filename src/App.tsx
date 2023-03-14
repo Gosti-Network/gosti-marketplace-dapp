@@ -1,29 +1,28 @@
 import { useEffect, useState } from "react";
-import './App.css';
 
 import { Box, Button } from "@mui/material";
 import MainTopBar from "./components/MainTopBar";
 import { Media } from "./spriggan-shared/types/Media";
 
-import { useWalletConnectClient } from "./chia-walletconnect/WalletConnectClientContext";
-import { useWalletConnectRpc, WalletConnectRpcParams } from "./chia-walletconnect/WalletConnectRpcContext";
+import { useWalletConnectClient } from "./chia-walletconnect/contexts/WalletConnectClientContext";
+import { useWalletConnectRpc, WalletConnectRpcParams } from "./chia-walletconnect/contexts/WalletConnectRpcContext";
 import GameGrid from "./components/GameGrid";
 import { useSearch } from "./spriggan-shared/contexts/SearchContext";
 import { SearchParams } from "./spriggan-shared/types/SearchTypes";
 
 function App() {
 	const [searchTerm, setSearchTerm] = useState<string>("");
-	const [searchDebounce, setSearchDebounce] = useState<NodeJS.Timeout>(setTimeout(async () => {}, 100));
+	const [searchDebounce, setSearchDebounce] = useState<NodeJS.Timeout>(setTimeout(async () => { }, 100));
 	const [activeOffer, setActiveOffer] = useState<string>("");
 
 	const { search } = useSearch()
-	
+
 	const [searchResults, setSearchResults] = useState<Media[]>([]);
 	useEffect(() => {
 		if (searchTerm !== "") {
 			clearTimeout(searchDebounce)
 			setSearchDebounce(setTimeout(async () => {
-				setSearchResults(await search.search({titleTerm: searchTerm} as SearchParams))
+				setSearchResults(await search.search({ titleTerm: searchTerm } as SearchParams))
 			}, 300));
 		}
 	}, [searchTerm]);
@@ -83,18 +82,22 @@ function App() {
 		}, 1000 * 60 * 1);
 
 		return () => clearInterval(interval)
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [session]);
 
 	const onConnect = () => {
 		if (typeof client === "undefined") {
 			throw new Error("WalletConnect is not initialized");
 		}
+		console.log("asdfasfd", pairings)
 		// Suggest existing pairings (if any).
 		if (pairings.length) {
-			connect(pairings[pairings.length-1]);
+			connect(pairings[pairings.length - 1]).then(() => {
+				if (!session) {
+					connect()
+				}
+			});
 		} else {
-			// If no existing pairings are available, trigger `WalletConnectClient.connect`.
 			connect();
 		}
 	};
@@ -108,19 +111,13 @@ function App() {
 		}
 	};
 
-	
+
 	return (
-			<Box>
-				<Button onClick={async () => {
-					if (session) {
-						var x = session.namespaces.chia.accounts[0].split(":");
-						await walletconnectRpc.getNFTs({ fingerprint: x[2] } as WalletConnectRpcParams);
-					}
-				}}>Execute test</Button>
-				{MainTopBar(session, onConnect, disconnect, (event) => {setSearchTerm(event.target.value)})}
-				{GameGrid("Search Results", searchResults, executeOffer, setActiveOffer)}
-				{GameGrid("Recently Updated", mostRecentResults, executeOffer, setActiveOffer)}
-			</Box>
+		<Box>
+			{MainTopBar(session, onConnect, disconnect, (event) => { setSearchTerm(event.target.value) })}
+			{GameGrid("Search Results", searchResults, executeOffer, setActiveOffer)}
+			{GameGrid("Recently Updated", mostRecentResults, executeOffer, setActiveOffer)}
+		</Box>
 	);
 }
 

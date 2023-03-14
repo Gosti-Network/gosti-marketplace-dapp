@@ -1,0 +1,10 @@
+node_modules
+dist
+examples
+daemon
+build
+*_old
+locales
+restoreMessages.js
+rollup.config.js
+webpack.**

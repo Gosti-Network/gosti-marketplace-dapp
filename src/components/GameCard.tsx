@@ -14,16 +14,16 @@ export type GameCardProps = {
 	onBuy: () => void;
 };
 
-export default function GameCard( props: GameCardProps ) {
+export default function GameCard(props: GameCardProps) {
 
 	const [open, setOpen] = React.useState(false);
 
 	const handleClickOpen = () => {
 		setOpen(true);
-	};	
+	};
 
 	return (
-		<div><Card sx={{ maxWidth: 345 }} onClick={ handleClickOpen }>
+		<div><Card sx={{ maxWidth: 345 }} onClick={handleClickOpen}>
 			<CardActionArea>
 				<CardMedia
 					component="img"
@@ -32,16 +32,16 @@ export default function GameCard( props: GameCardProps ) {
 					alt={props.game.title}
 				/>
 				<CardContent>
-				<Typography gutterBottom variant="h5">
-					{props.game.title}
-				</Typography>
-				<Typography variant="body2" color="text.secondary">
-					{props.game.shortDescription}
-				</Typography>
+					<Typography gutterBottom variant="h5">
+						{props.game.title}
+					</Typography>
+					<Typography variant="body2" color="text.secondary">
+						{props.game.shortDescription}
+					</Typography>
 				</CardContent>
 			</CardActionArea>
 		</Card>
-		{StorePage({open, setOpen, ...props} as StorePageProps)}
+			{StorePage({ open, setOpen, ...props } as StorePageProps)}
 		</div>
 	);
 };
