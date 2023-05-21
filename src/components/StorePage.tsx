@@ -1,5 +1,5 @@
-import * as React from 'react';
-import ReactMarkdown from 'react-markdown'
+import { Buffer } from 'buffer';
+
 import CloseIcon from '@mui/icons-material/Close';
 import {
 	Grid, Tab, Tabs, Dialog, Container, Typography, Button,
@@ -9,14 +9,14 @@ import {
 import axios from "axios";
 import { bech32m } from "bech32";
 import { sha256 } from 'js-sha256';
+import * as React from 'react';
 import { Dispatch, SetStateAction, useEffect } from 'react';
-import { Buffer } from 'buffer';
+import ReactMarkdown from 'react-markdown';
+
 
 import { Media } from '../spriggan-shared/types/Media';
 
-const Transition = React.forwardRef((props: SlideProps, ref) => {
-	return <Slide direction="up" ref={ref} {...props} />;
-});
+const Transition = React.forwardRef((props: SlideProps, ref) => <Slide direction="up" ref={ref} {...props} />);
 
 export type TabPanelProps = {
 	children: any,
@@ -52,7 +52,7 @@ function TabProps(index: number) {
 }
 
 export type StorePageProps = {
-	game: Media;
+	media: Media;
 	setActiveOffer: Dispatch<SetStateAction<string>>;
 	onBuy: () => void;
 	open: boolean,
@@ -60,39 +60,40 @@ export type StorePageProps = {
 };
 
 export default function StorePage(props: StorePageProps) {
+	const { media, setActiveOffer, onBuy, open, setOpen } = props;
 
 	const [price, setPrice] = React.useState("");
 	const [asset, setAsset] = React.useState('XCH');
 	const [tab, setTab] = React.useState(0);
 
 	useEffect(() => {
-		var pubdid = props.game.publisherDid;
-		var id = props.game.productId;
+		const pubdid = media.publisherDid;
+		const id = media.productId;
 
-		var decoded = Buffer.from(bech32m.fromWords(bech32m.decode(pubdid).words)).toString("hex")
+		const decoded = Buffer.from(bech32m.fromWords(bech32m.decode(pubdid).words)).toString("hex");
 
-		var col = sha256.create().update(decoded + id).hex()
-		var collectionID = bech32m.encode("col", bech32m.toWords(Buffer.from(col, "hex")))
+		const col = sha256.create().update(decoded + id).hex();
+		const collectionID = bech32m.encode("col", bech32m.toWords(Buffer.from(col, "hex")));
 
-		axios.get(`https://api.dexie.space/v1/offers`, { params: { requested: asset, offered: collectionID, page_size: 1 } })
+		axios.get(`https://api-testnet.dexie.space/v1/offers`, { params: { requested: asset, offered: collectionID, page_size: 1 } })
 			.then(res => {
 				console.log(res);
 				if (res.data.offers.length > 0) {
-					props.setActiveOffer(res.data.offers[0].offer)
+					setActiveOffer(res.data.offers[0].offer);
 					setPrice(res.data.offers[0].requested[0].amount);
 				} else {
 					setPrice("Not Found");
 				}
 			}
-			)
-	}, [asset]);
+			);
+	}, [asset, media, setActiveOffer]);
 
 	const assets = [
 		'XCH', 'USDS', 'SBX'
 	];
 
 	const handleClose = () => {
-		props.setOpen(false);
+		setOpen(false);
 	};
 
 	const handleTabChange = (event: React.SyntheticEvent<Element, Event>, newValue: number) => {
@@ -102,7 +103,7 @@ export default function StorePage(props: StorePageProps) {
 	return (
 		<Dialog
 			fullScreen
-			open={props.open}
+			open={open}
 			onClose={handleClose}
 			TransitionComponent={Transition}
 		>
@@ -117,7 +118,7 @@ export default function StorePage(props: StorePageProps) {
 						<CloseIcon />
 					</IconButton>
 					<Typography sx={{ ml: 2, flex: 1 }} variant="h6">
-						{props.game.title}
+						{media.title}
 					</Typography>
 				</Toolbar>
 			</AppBar>
@@ -140,7 +141,7 @@ export default function StorePage(props: StorePageProps) {
 							<Card sx={{ m: 0, p: 2, height: '100%' }} >
 								<CardMedia
 									component="iframe"
-									src={(props.game.trailerSource === 'youtube') ? "https://www.youtube.com/embed/" + props.game.trailer + "?autoplay=1&origin=http://.com" : ""}
+									src={(media.trailerSource === 'youtube') ? `https://www.youtube.com/embed/${media.trailer}?autoplay=1&origin=http://.com` : ""}
 									height={'360'}
 								/>
 							</Card>
@@ -152,17 +153,17 @@ export default function StorePage(props: StorePageProps) {
 					<Grid id="infoSection" item xs={12} md={4} sx={{ height: '100%' }}>
 						<Stack sx={{ height: '100%' }}>
 							<Card sx={{ p: 1, m: 1, height: '60%' }}>
-								<Typography p={1} variant="h5">{props.game.title}</Typography>
+								<Typography p={1} variant="h5">{media.title}</Typography>
 								<Divider />
-								<Typography p={2}>{props.game.description}</Typography>
+								<Typography p={2}>{media.description}</Typography>
 								<Divider />
-								<Typography p={2}>{props.game.tags}</Typography>
+								<Typography p={2}>{media.tags}</Typography>
 							</Card>
 							<Card sx={{ m: 1, height: '40%' }}>
 								<Grid container>
 									<Grid p={2} item sx={{ width: .5 }}>
 										<Typography p={2}>{price} {asset}</Typography>
-										<Button fullWidth={true} variant="contained" onClick={props.onBuy}>Buy</Button>
+										<Button fullWidth={true} variant="contained" onClick={onBuy}>Buy</Button>
 									</Grid>
 									<Grid p={4} item sx={{ width: .5 }}>
 										<Autocomplete
@@ -186,7 +187,7 @@ export default function StorePage(props: StorePageProps) {
 						</Stack>
 					</Grid>
 					<Card sx={{ m: 1, p: 4, width: '100%' }}>
-						<ReactMarkdown children={props.game.longDescription} />
+						<ReactMarkdown children={media.longDescription} />
 					</Card>
 				</Grid>
 			</Container>

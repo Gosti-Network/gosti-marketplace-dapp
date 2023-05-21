@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
 
-import { Box, Button } from "@mui/material";
-import MainTopBar from "./components/MainTopBar";
-import { Media } from "./spriggan-shared/types/Media";
+import { Box } from "@mui/material";
+import { useEffect, useState } from "react";
 
 import { useWalletConnectClient } from "./chia-walletconnect/contexts/WalletConnectClientContext";
 import { useWalletConnectRpc, WalletConnectRpcParams } from "./chia-walletconnect/contexts/WalletConnectRpcContext";
 import GameGrid from "./components/GameGrid";
+import MainTopBar from "./components/MainTopBar";
 import { useSearch } from "./spriggan-shared/contexts/SearchContext";
+import { Media } from "./spriggan-shared/types/Media";
 import { SearchParams } from "./spriggan-shared/types/SearchTypes";
 
 function App() {
@@ -15,17 +15,18 @@ function App() {
 	const [searchDebounce, setSearchDebounce] = useState<NodeJS.Timeout>(setTimeout(async () => { }, 100));
 	const [activeOffer, setActiveOffer] = useState<string>("");
 
-	const { search } = useSearch()
+	const { search } = useSearch();
 
 	const [searchResults, setSearchResults] = useState<Media[]>([]);
 	useEffect(() => {
 		if (searchTerm !== "") {
-			clearTimeout(searchDebounce)
+			clearTimeout(searchDebounce);
 			setSearchDebounce(setTimeout(async () => {
-				setSearchResults(await search.search({ titleTerm: searchTerm } as SearchParams))
+				setSearchResults(await search.search({ titleTerm: searchTerm } as SearchParams));
 			}, 300));
 		}
-	}, [searchTerm]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- need to ignore debounce for timeout
+	}, [searchTerm, search]);
 
 	const [mostRecentResults, setMostRecentResults] = useState<Media[]>([]);
 	useEffect(() => {
@@ -63,17 +64,18 @@ function App() {
 			try {
 				const connected = await ping();
 				if (!connected) {
-					disconnect()
+					disconnect();
 				}
-				return connected
+				return connected;
 			} catch (e) {
-				console.log("ping fail", e)
+				console.log("ping fail", e);
 				disconnect();
+				return null;
 			}
 		}
 
 		if (!isInitializing) {
-			testConnection()
+			testConnection();
 		}
 
 		const interval = setInterval(() => {
@@ -81,20 +83,19 @@ function App() {
 			console.log("Ping: ", testConnection());
 		}, 1000 * 60 * 1);
 
-		return () => clearInterval(interval)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [session]);
+		return () => clearInterval(interval);
+	}, [session, disconnect, isInitializing, ping]);
 
 	const onConnect = () => {
 		if (typeof client === "undefined") {
 			throw new Error("WalletConnect is not initialized");
 		}
-		console.log("asdfasfd", pairings)
+		console.log("asdfasfd", pairings);
 		// Suggest existing pairings (if any).
 		if (pairings.length) {
 			connect(pairings[pairings.length - 1]).then(() => {
 				if (!session) {
-					connect()
+					connect();
 				}
 			});
 		} else {
@@ -105,8 +106,8 @@ function App() {
 
 	const executeOffer = async () => {
 		if (session && activeOffer) {
-			var x = session.namespaces.chia.accounts[0].split(":");
-			console.log(x[0] + ':' + x[1], x[2]);
+			const x = session.namespaces.chia.accounts[0].split(":");
+			console.log(`${x[0]}:${x[1]}`, x[2]);
 			await walletconnectRpc.takeOffer({ fingerprint: x[2], offer: activeOffer, fee: 1 } as WalletConnectRpcParams);
 		}
 	};
@@ -114,7 +115,7 @@ function App() {
 
 	return (
 		<Box>
-			{MainTopBar(session, onConnect, disconnect, (event) => { setSearchTerm(event.target.value) })}
+			{MainTopBar(session, onConnect, disconnect, (event) => { setSearchTerm(event.target.value); })}
 			{GameGrid("Search Results", searchResults, executeOffer, setActiveOffer)}
 			{GameGrid("Recently Updated", mostRecentResults, executeOffer, setActiveOffer)}
 		</Box>

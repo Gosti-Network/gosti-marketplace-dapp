@@ -1,8 +1,8 @@
-import * as React from 'react';
 import {
 	CardActionArea, Typography,
 	CardMedia, CardContent, Card
 } from '@mui/material';
+import * as React from 'react';
 import { Dispatch, SetStateAction } from 'react';
 
 import { Media } from '../spriggan-shared/types/Media';
@@ -15,6 +15,7 @@ export type GameCardProps = {
 };
 
 export default function GameCard(props: GameCardProps) {
+	const { game } = props;
 
 	const [open, setOpen] = React.useState(false);
 
@@ -41,7 +42,7 @@ export default function GameCard(props: GameCardProps) {
 				</CardContent>
 			</CardActionArea>
 		</Card>
-			{StorePage({ open, setOpen, ...props } as StorePageProps)}
+			{StorePage({ media: game, open, setOpen, ...props } as StorePageProps)}
 		</div>
 	);
 };

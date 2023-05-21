@@ -1,5 +1,6 @@
 import { Grid, Typography } from "@mui/material";
 import Paper from "@mui/material/Paper";
+
 import { Media } from "../spriggan-shared/types/Media";
 import GameCard from "./GameCard";
 
@@ -10,7 +11,7 @@ const GameGrid = (
 	setActiveOffer: React.Dispatch<React.SetStateAction<string>>
 ) => {
 
-	let render = <></>
+	let render = <></>;
 
 	if (searchResults.length > 0) {
 		render =
@@ -27,7 +28,7 @@ const GameGrid = (
 						</Grid>
 					))}
 				</Grid>
-			</Paper>
+			</Paper>;
 	}
 
 	return (
@@ -35,6 +36,6 @@ const GameGrid = (
 			{render}
 		</Paper>
 	);
-}
+};
 
 export default GameGrid;

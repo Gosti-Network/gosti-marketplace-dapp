@@ -5,7 +5,7 @@ const ThemeSwitcher = () => {
 	const { mode, setMode } = useColorScheme();
 	const [mounted, setMounted] = useState(false);
 
-	setMode('dark')
+	setMode('dark');
 
 	useEffect(() => {
 		setMounted(true);
