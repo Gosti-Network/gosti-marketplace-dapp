@@ -6,7 +6,7 @@ import { useWalletConnectClient } from "./chia-walletconnect/contexts/WalletConn
 import { useWalletConnectRpc, WalletConnectRpcParams } from "./chia-walletconnect/contexts/WalletConnectRpcContext";
 import GameGrid from "./components/GameGrid";
 import MainTopBar from "./components/MainTopBar";
-import { useSearch } from "./spriggan-shared/contexts/SearchContext";
+import { useMarketplaceApi } from "./spriggan-shared/contexts/MarketplaceApiContext";
 import { Media } from "./spriggan-shared/types/Media";
 import { SearchParams } from "./spriggan-shared/types/SearchTypes";
 
@@ -15,7 +15,7 @@ function App() {
 	const [searchDebounce, setSearchDebounce] = useState<NodeJS.Timeout>(setTimeout(async () => { }, 100));
 	const [activeOffer, setActiveOffer] = useState<string>("");
 
-	const { search } = useSearch();
+	const { search } = useMarketplaceApi();
 
 	const [searchResults, setSearchResults] = useState<Media[]>([]);
 	useEffect(() => {
@@ -74,14 +74,10 @@ function App() {
 			}
 		}
 
-		if (!isInitializing) {
-			testConnection();
-		}
-
 		const interval = setInterval(() => {
 			// This will run every 10 mins
 			console.log("Ping: ", testConnection());
-		}, 1000 * 60 * 1);
+		}, 1000 * 60 * 0.5);
 
 		return () => clearInterval(interval);
 	}, [session, disconnect, isInitializing, ping]);
