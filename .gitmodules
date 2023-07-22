@@ -1,6 +1,3 @@
 [submodule "src/spriggan-shared"]
 	path = src/spriggan-shared
 	url = https://github.com/Open-Market-Dev-Club/spriggan-shared.git
-[submodule "src/chia-walletconnect"]
-	path = src/chia-walletconnect
-	url = https://github.com/Open-Market-Dev-Club/chia-walletconnect.git

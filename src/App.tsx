@@ -2,13 +2,14 @@
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 
-import { useWalletConnectClient } from "./chia-walletconnect/contexts/WalletConnectClientContext";
-import { useWalletConnectRpc, WalletConnectRpcParams } from "./chia-walletconnect/contexts/WalletConnectRpcContext";
 import GameGrid from "./components/GameGrid";
 import MainTopBar from "./components/MainTopBar";
+import { useJsonRpc } from "./spriggan-shared/contexts/JsonRpcContext";
 import { useMarketplaceApi } from "./spriggan-shared/contexts/MarketplaceApiContext";
-import { Media } from "./spriggan-shared/types/Media";
-import { SearchParams } from "./spriggan-shared/types/SearchTypes";
+import { useWalletConnect } from "./spriggan-shared/contexts/WalletConnectContext";
+import { SearchRequest, SortOptions } from "./spriggan-shared/types/spriggan/MarketplaceApiTypes";
+import { Media } from "./spriggan-shared/types/spriggan/Media";
+import { TakeOfferRequest } from "./spriggan-shared/types/walletconnect/rpc/TakeOffer";
 
 function App() {
 	const [searchTerm, setSearchTerm] = useState<string>("");
@@ -22,7 +23,8 @@ function App() {
 		if (searchTerm !== "") {
 			clearTimeout(searchDebounce);
 			setSearchDebounce(setTimeout(async () => {
-				setSearchResults(await search.search({ titleTerm: searchTerm } as SearchParams));
+				const searchResponse = await search({ titleTerm: searchTerm, sort: SortOptions.lastUpdatedDesc } as SearchRequest);
+				setSearchResults(searchResponse.results);
 			}, 300));
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- need to ignore debounce for timeout
@@ -31,7 +33,8 @@ function App() {
 	const [mostRecentResults, setMostRecentResults] = useState<Media[]>([]);
 	useEffect(() => {
 		async function fetchData() {
-			setMostRecentResults(await search.mostRecent({} as SearchParams));
+			const searchResponse = await search({ sort: SortOptions.lastUpdatedDesc } as SearchRequest);
+			setMostRecentResults(searchResponse.results);
 		}
 		fetchData();
 	}, [search]);
@@ -41,59 +44,25 @@ function App() {
 		document.title = `Spriggan Marketplace`;
 	}, [searchResults]);
 
-
-	// Initialize the WalletConnect client.
 	const {
 		client,
 		pairings,
 		session,
 		connect,
 		disconnect,
-		isInitializing,
-	} = useWalletConnectClient();
+	} = useWalletConnect();
 
-	// Use `JsonRpcContext` to provide us with relevant RPC methods and states.
 	const {
-		ping,
-		walletconnectRpc,
-	} = useWalletConnectRpc();
-
-
-	useEffect(() => {
-		async function testConnection() {
-			try {
-				const connected = await ping();
-				if (!connected) {
-					disconnect();
-				}
-				return connected;
-			} catch (e) {
-				console.log("ping fail", e);
-				disconnect();
-				return null;
-			}
-		}
-
-		const interval = setInterval(() => {
-			// This will run every 10 mins
-			console.log("Ping: ", testConnection());
-		}, 1000 * 60 * 0.5);
-
-		return () => clearInterval(interval);
-	}, [session, disconnect, isInitializing, ping]);
+		takeOffer
+	} = useJsonRpc();
 
 	const onConnect = () => {
-		if (typeof client === "undefined") {
-			throw new Error("WalletConnect is not initialized");
-		}
-		console.log("asdfasfd", pairings);
-		// Suggest existing pairings (if any).
-		if (pairings.length) {
-			connect(pairings[pairings.length - 1]).then(() => {
-				if (!session) {
-					connect();
-				}
-			});
+		if (!client) throw new Error('WalletConnect is not initialized.');
+
+		if (pairings.length === 1) {
+			connect({ topic: pairings[0].topic });
+		} else if (pairings.length) {
+			console.log('The pairing modal is not implemented.', pairings);
 		} else {
 			connect();
 		}
@@ -104,7 +73,7 @@ function App() {
 		if (session && activeOffer) {
 			const x = session.namespaces.chia.accounts[0].split(":");
 			console.log(`${x[0]}:${x[1]}`, x[2]);
-			await walletconnectRpc.takeOffer({ fingerprint: x[2], offer: activeOffer, fee: 1 } as WalletConnectRpcParams);
+			await takeOffer({ fingerprint: x[2], offer: activeOffer, fee: 1 } as TakeOfferRequest);
 		}
 	};
 

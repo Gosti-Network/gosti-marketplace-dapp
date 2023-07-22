@@ -1,7 +1,7 @@
 import { Grid, Typography } from "@mui/material";
 import Paper from "@mui/material/Paper";
 
-import { Media } from "../spriggan-shared/types/Media";
+import { Media } from "../spriggan-shared/types/spriggan/Media";
 import GameCard from "./GameCard";
 
 const GameGrid = (

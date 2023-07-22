@@ -5,7 +5,7 @@ import {
 import * as React from 'react';
 import { Dispatch, SetStateAction } from 'react';
 
-import { Media } from '../spriggan-shared/types/Media';
+import { Media } from '../spriggan-shared/types/spriggan/Media';
 import StorePage, { StorePageProps } from './StorePage';
 
 export type GameCardProps = {

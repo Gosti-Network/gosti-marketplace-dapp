@@ -5,9 +5,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 import App from './App';
-import { WalletConnectClientContextProvider } from "./chia-walletconnect/contexts/WalletConnectClientContext";
-import { WalletConnectRpcContextProvider } from "./chia-walletconnect/contexts/WalletConnectRpcContext";
+import { CHAIN_ID, PROJECT_ID, RELAY_URL } from "./spriggan-shared/constants/env";
+import { JsonRpcProvider } from "./spriggan-shared/contexts/JsonRpcContext";
 import { MarketplaceApiContextProvider } from "./spriggan-shared/contexts/MarketplaceApiContext";
+import { WalletConnectProvider } from "./spriggan-shared/contexts/WalletConnectContext";
 
 const theme = extendTheme({
 	colorSchemes: {
@@ -28,16 +29,17 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
 	<React.StrictMode>
 		<CssVarsProvider theme={theme}>
-			<WalletConnectClientContextProvider>
-				<WalletConnectRpcContextProvider>
-					{/* <SprigganRpcContext> */}
+			<WalletConnectProvider
+				projectId={PROJECT_ID}
+				relayUrl={RELAY_URL}
+				chainId={CHAIN_ID}>
+				<JsonRpcProvider>
 					<MarketplaceApiContextProvider>
 						<CssBaseline />
 						<App />
 					</MarketplaceApiContextProvider>
-					{/* </SprigganRpcContext> */}
-				</WalletConnectRpcContextProvider>
-			</WalletConnectClientContextProvider>
+				</JsonRpcProvider>
+			</WalletConnectProvider>
 		</CssVarsProvider>
 	</React.StrictMode>
 );

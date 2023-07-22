@@ -14,7 +14,7 @@ import { Dispatch, SetStateAction, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 
-import { Media } from '../spriggan-shared/types/Media';
+import { Media } from '../spriggan-shared/types/spriggan/Media';
 
 const Transition = React.forwardRef((props: SlideProps, ref) => <Slide direction="up" ref={ref} {...props} />);
 
@@ -63,12 +63,14 @@ export default function StorePage(props: StorePageProps) {
 	const { media, setActiveOffer, onBuy, open, setOpen } = props;
 
 	const [price, setPrice] = React.useState("");
-	const [asset, setAsset] = React.useState('XCH');
+	const [asset, setAsset] = React.useState('TXCH');
 	const [tab, setTab] = React.useState(0);
 
 	useEffect(() => {
 		const pubdid = media.publisherDid;
 		const id = media.productId;
+		console.log("pubdid", pubdid);
+		console.log("id", id);
 
 		const decoded = Buffer.from(bech32m.fromWords(bech32m.decode(pubdid).words)).toString("hex");
 
@@ -89,7 +91,7 @@ export default function StorePage(props: StorePageProps) {
 	}, [asset, media, setActiveOffer]);
 
 	const assets = [
-		'XCH', 'USDS', 'SBX'
+		'TXCH', 'USDS', 'SBX'
 	];
 
 	const handleClose = () => {
