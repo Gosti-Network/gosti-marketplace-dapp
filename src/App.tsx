@@ -1,22 +1,39 @@
-
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import GameGrid from "./components/GameGrid";
 import MainTopBar from "./components/MainTopBar";
-import { useJsonRpc } from "./spriggan-shared/contexts/JsonRpcContext";
-import { useMarketplaceApi } from "./spriggan-shared/contexts/MarketplaceApiContext";
-import { useWalletConnect } from "./spriggan-shared/contexts/WalletConnectContext";
-import { SearchRequest, SortOptions } from "./spriggan-shared/types/spriggan/MarketplaceApiTypes";
-import { Media } from "./spriggan-shared/types/spriggan/Media";
-import { TakeOfferRequest } from "./spriggan-shared/types/walletconnect/rpc/TakeOffer";
+import { useJsonRpc } from "./gosti-shared/contexts/JsonRpcContext";
+import { useMarketplaceApi } from "./gosti-shared/contexts/MarketplaceApiContext";
+import { useGostiRpc } from "./gosti-shared/contexts/GostiRpcContext";
+import { useWalletConnect } from "./gosti-shared/contexts/WalletConnectContext";
+import { SearchRequest, SortOptions } from "./gosti-shared/types/gosti/MarketplaceApiTypes";
+import { Media } from "./gosti-shared/types/gosti/Media";
+import { TakeOfferRequest } from "./gosti-shared/types/walletconnect/rpc/TakeOffer";
 
 function App() {
+
+	const { config, getConfig, saveConfig } = useGostiRpc();
+
+	useEffect(() => {
+		async function fetchData() {
+			getConfig({});
+		}
+		fetchData();
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- only run once
+	}, []);
+
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [searchDebounce, setSearchDebounce] = useState<NodeJS.Timeout>(setTimeout(async () => { }, 100));
 	const [activeOffer, setActiveOffer] = useState<string>("");
 
-	const { search } = useMarketplaceApi();
+	const { search, setApiUrl } = useMarketplaceApi();
+
+	useEffect(() => {
+		if (config?.activeMarketplace) {
+			setApiUrl(config.activeMarketplace.url);
+		}
+	}, [config, saveConfig, setApiUrl]);
 
 	const [searchResults, setSearchResults] = useState<Media[]>([]);
 	useEffect(() => {
@@ -28,7 +45,7 @@ function App() {
 			}, 300));
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- need to ignore debounce for timeout
-	}, [searchTerm, search]);
+	}, [searchTerm, search, saveConfig]);
 
 	const [mostRecentResults, setMostRecentResults] = useState<Media[]>([]);
 	useEffect(() => {
@@ -41,7 +58,7 @@ function App() {
 
 
 	useEffect(() => {
-		document.title = `Spriggan Marketplace`;
+		document.title = `Gosti Marketplace`;
 	}, [searchResults]);
 
 	const {
@@ -72,7 +89,6 @@ function App() {
 	const executeOffer = async () => {
 		if (session && activeOffer) {
 			const x = session.namespaces.chia.accounts[0].split(":");
-			console.log(`${x[0]}:${x[1]}`, x[2]);
 			await takeOffer({ fingerprint: x[2], offer: activeOffer, fee: 1 } as TakeOfferRequest);
 		}
 	};
@@ -80,7 +96,7 @@ function App() {
 
 	return (
 		<Box>
-			{MainTopBar(session, onConnect, disconnect, (event) => { setSearchTerm(event.target.value); })}
+			{MainTopBar(session, config, saveConfig, onConnect, disconnect, setSearchTerm)}
 			{GameGrid("Search Results", searchResults, executeOffer, setActiveOffer)}
 			{GameGrid("Recently Updated", mostRecentResults, executeOffer, setActiveOffer)}
 		</Box>
