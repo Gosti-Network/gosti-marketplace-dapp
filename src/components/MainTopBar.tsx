@@ -14,7 +14,6 @@ import React, { useState } from 'react';
 
 import { AddMarketplaceModal } from '../gosti-shared/components/AddMarketplaceModal';
 import WalletConnectMenu from '../gosti-shared/components/WalletConnectMenu';
-import { GostiRpcCallback } from '../gosti-shared/contexts/GostiRpcContext';
 import { GostiConfig } from '../gosti-shared/types/gosti/GostiRpcTypes';
 import ThemeSwitcher from "./ThemeSwitcher";
 
@@ -62,7 +61,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function PrimarySearchAppBar(
 	session: SessionTypes.Struct | undefined,
 	config: GostiConfig | undefined,
-	saveConfig: GostiRpcCallback,
+	saveConfig: (config: GostiConfig) => void,
 	connectToWallet: () => void,
 	disconnectFromWallet: () => void,
 	setSearchTerm: React.Dispatch<React.SetStateAction<string>>,
