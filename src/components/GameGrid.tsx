@@ -7,8 +7,6 @@ import GameCard from "./GameCard";
 const GameGrid = (
 	title: string,
 	searchResults: Media[],
-	onBuy: () => Promise<void>,
-	setActiveOffer: React.Dispatch<React.SetStateAction<string>>
 ) => {
 
 	let render = <></>;
@@ -22,8 +20,6 @@ const GameGrid = (
 						<Grid key={result.productId} item xs={6} sm={4} md={3} lg={2}>
 							<GameCard
 								game={result}
-								onBuy={onBuy}
-								setActiveOffer={setActiveOffer}
 							/>
 						</Grid>
 					))}

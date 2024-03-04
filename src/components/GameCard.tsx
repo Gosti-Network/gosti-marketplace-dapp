@@ -3,15 +3,12 @@ import {
 	CardMedia, CardContent, Card
 } from '@mui/material';
 import * as React from 'react';
-import { Dispatch, SetStateAction } from 'react';
 
 import StorePage, { StorePageProps } from '../gosti-shared/components/StorePage';
 import { Media } from '../gosti-shared/types/gosti/Media';
 
 export type GameCardProps = {
 	game: Media;
-	setActiveOffer: Dispatch<SetStateAction<string>>;
-	onBuy: () => void;
 };
 
 export default function GameCard(props: GameCardProps) {
@@ -42,7 +39,7 @@ export default function GameCard(props: GameCardProps) {
 				</CardContent>
 			</CardActionArea>
 		</Card>
-			{StorePage({ media: game, open, setOpen, ...props } as StorePageProps)}
+			{StorePage({ media: game, open, setOpen } as StorePageProps)}
 		</div>
 	);
 };

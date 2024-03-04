@@ -1,57 +1,26 @@
 import { Box } from "@mui/material";
-import { invoke } from "@tauri-apps/api/tauri";
 import { useEffect, useState } from "react";
 
 import GameGrid from "./components/GameGrid";
 import MainTopBar from "./components/MainTopBar";
-import { useJsonRpc } from "./gosti-shared/contexts/JsonRpcContext";
 import { useMarketplaceApi } from "./gosti-shared/contexts/MarketplaceApiContext";
 import { useWalletConnect } from "./gosti-shared/contexts/WalletConnectContext";
-import { GostiConfig } from "./gosti-shared/types/gosti/GostiRpcTypes";
 import { SearchRequest, SortOptions } from "./gosti-shared/types/gosti/MarketplaceApiTypes";
 import { Media } from "./gosti-shared/types/gosti/Media";
-import { TakeOfferRequest } from "./gosti-shared/types/walletconnect/rpc/TakeOffer";
 
 
 function App() {
-	const [config, setConfig] = useState<GostiConfig | undefined>(undefined);
-
-	useEffect(() => {
-		async function fetchData() {
-			const configResponse: any = await invoke("get_config");
-			console.log("get_config", configResponse);
-			setConfig(configResponse.result);
-		}
-		fetchData();
-	}, []);
-
-	useEffect(() => {
-		async function updateConfig() {
-			const configResponse: any = await invoke("save_config", { config });
-			console.log("save_config", configResponse);
-		}
-		if (config)
-			updateConfig();
-	}, [config]);
-
-
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [searchDebounce, setSearchDebounce] = useState<NodeJS.Timeout>(setTimeout(async () => { }, 100));
-	const [activeOffer, setActiveOffer] = useState<string>("");
 
-	const { search, setApiUrl } = useMarketplaceApi();
-
-	useEffect(() => {
-		if (config?.activeMarketplace) {
-			setApiUrl(config.activeMarketplace.url);
-		}
-	}, [config, setApiUrl]);
+	const { search } = useMarketplaceApi();
 
 	const [searchResults, setSearchResults] = useState<Media[]>([]);
 	useEffect(() => {
 		if (searchTerm !== "") {
 			clearTimeout(searchDebounce);
 			setSearchDebounce(setTimeout(async () => {
+				console.log("Searching for", searchTerm);
 				const searchResponse = await search({ titleTerm: searchTerm, sort: SortOptions.lastUpdatedDesc } as SearchRequest);
 				setSearchResults(searchResponse.results);
 			}, 300));
@@ -81,10 +50,6 @@ function App() {
 		disconnect,
 	} = useWalletConnect();
 
-	const {
-		takeOffer
-	} = useJsonRpc();
-
 	const onConnect = () => {
 		if (!client) throw new Error('WalletConnect is not initialized.');
 
@@ -97,20 +62,11 @@ function App() {
 		}
 	};
 
-
-	const executeOffer = async () => {
-		if (session && activeOffer) {
-			const x = session.namespaces.chia.accounts[0].split(":");
-			await takeOffer({ fingerprint: x[2], offer: activeOffer, fee: 1 } as TakeOfferRequest);
-		}
-	};
-
-
 	return (
 		<Box>
-			{MainTopBar(session, config, setConfig, onConnect, disconnect, setSearchTerm)}
-			{GameGrid("Search Results", searchResults, executeOffer, setActiveOffer)}
-			{GameGrid("Recently Updated", mostRecentResults, executeOffer, setActiveOffer)}
+			{MainTopBar(session, onConnect, disconnect, setSearchTerm)}
+			{GameGrid("Search Results", searchResults)}
+			{GameGrid("Recently Updated", mostRecentResults)}
 		</Box>
 	);
 }

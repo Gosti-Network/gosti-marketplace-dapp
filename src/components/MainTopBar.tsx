@@ -14,7 +14,7 @@ import React, { useState } from 'react';
 
 import { AddMarketplaceModal } from '../gosti-shared/components/AddMarketplaceModal';
 import WalletConnectMenu from '../gosti-shared/components/WalletConnectMenu';
-import { GostiConfig } from '../gosti-shared/types/gosti/GostiRpcTypes';
+import { useGostiApi } from '../gosti-shared/contexts/GostiApiContext';
 import ThemeSwitcher from "./ThemeSwitcher";
 
 
@@ -60,8 +60,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function PrimarySearchAppBar(
 	session: SessionTypes.Struct | undefined,
-	config: GostiConfig | undefined,
-	saveConfig: (config: GostiConfig) => void,
 	connectToWallet: () => void,
 	disconnectFromWallet: () => void,
 	setSearchTerm: React.Dispatch<React.SetStateAction<string>>,
@@ -78,6 +76,8 @@ export default function PrimarySearchAppBar(
 	const closeAppMenu = () => {
 		setAnchor2El(null);
 	};
+
+	const { gostiConfig, setGostiConfig } = useGostiApi();
 
 
 	const mainMenuId = 'primary-search-main';
@@ -120,15 +120,14 @@ export default function PrimarySearchAppBar(
 						id={`marketplaces-select`}
 						clearIcon={null}
 						sx={{ width: 300, padding: 4 }}
-						options={config?.marketplaces?.map((marketplace) => marketplace.displayName).concat("Add New Marketplace") ?? []}
-						value={config?.activeMarketplace?.displayName ?? "Gosti Marketplace"}
+						options={gostiConfig.marketplaces.map((marketplace) => marketplace.displayName).concat("Add New Marketplace") ?? []}
+						value={gostiConfig.activeMarketplace.displayName ?? "Gosti Marketplace"}
 						onChange={
 							(event: any, value: string | null) => {
-								config?.marketplaces.forEach((marketplace) => {
-									if (marketplace.displayName === value || (value === "" && config?.activeMarketplace?.displayName === marketplace.displayName)) {
-										const tmp = config || {} as GostiConfig;
-										tmp.activeMarketplace = marketplace;
-										saveConfig(tmp);
+								gostiConfig.marketplaces.forEach((marketplace) => {
+									if (marketplace.displayName === value || (value === "" && gostiConfig.activeMarketplace.displayName === marketplace.displayName)) {
+										gostiConfig.activeMarketplace = marketplace;
+										setGostiConfig({ ...gostiConfig });
 									}
 								});
 								if (value === "Add New Marketplace") {
@@ -168,7 +167,7 @@ export default function PrimarySearchAppBar(
 				</Toolbar>
 			</AppBar>
 			{renderMainMenu}
-			{AddMarketplaceModal(addMarketplaceModalOpen, () => { setAddMarketplaceModalOpen(false); }, config, saveConfig)}
+			{AddMarketplaceModal(addMarketplaceModalOpen, () => { setAddMarketplaceModalOpen(false); })}
 		</Box>
 	);
 }
